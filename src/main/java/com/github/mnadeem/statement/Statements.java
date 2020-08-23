@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.github.mnadeem.statement.expression.CompositeExpression;
+import com.github.mnadeem.statement.expression.Expression;
+
 public class Statements {
 
 	private final List<Statement> statements;
@@ -77,5 +80,9 @@ public class Statements {
 	
 	public Statement get(int index) {
 		return this.statements.get(index);
+	}
+
+	public Expression getExpression() {
+		return new CompositeExpression(this.getNames());
 	}
 }
