@@ -36,6 +36,9 @@ public class CompositeExpression implements Expression {
 		for (Statement statement : statements.getAll()) {
 			currentStatement++;
 			Expression expression = Expressions.get(statement);
+			if (expression == null) {
+				throw new IllegalStateException("Exceptin not found for " + statement.getLhs());
+			}
 			result = expression.evaluate(statements, currentStatement, nameValue);
 			Conjunction conjunction = statement.getConjunction();
 			if (conjunction != null && conjunction.isAnd() && !result) {
