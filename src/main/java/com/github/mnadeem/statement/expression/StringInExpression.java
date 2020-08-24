@@ -2,14 +2,13 @@ package com.github.mnadeem.statement.expression;
 
 import java.util.Arrays;
 
-import com.github.mnadeem.statement.Operator;
 import com.github.mnadeem.statement.Statement;
 import com.github.mnadeem.statement.Statements;
 
 public class StringInExpression extends BaseExpression {
 
 	public StringInExpression(String name) {
-		super(name, Operator.IN);
+		super(name);
 	}
 
 	@Override

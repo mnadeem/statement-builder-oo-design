@@ -14,7 +14,6 @@ public class EqualsExpressionTest {
 		String raw = "Asabasef == 2 ";
 		Statements statements = new Statements(raw);
 		EqualsExpression expression = new EqualsExpression(null);
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("2")), equalTo(true));
 	}
 
@@ -23,7 +22,6 @@ public class EqualsExpressionTest {
 		String raw = "Asabasef == 2 ";
 		Statements statements = new Statements(raw);
 		EqualsExpression expression = new EqualsExpression(null);
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("3")), equalTo(false));
 	}
 
@@ -32,7 +30,6 @@ public class EqualsExpressionTest {
 		String raw = "Asabasef == 2 ";
 		Statements statements = new Statements(raw);
 		EqualsExpression expression = new EqualsExpression(null);
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("1")), equalTo(false));
 	}
 
@@ -41,7 +38,6 @@ public class EqualsExpressionTest {
 		String raw = "SOFT_COST == 2 ";
 		Statements statements = new Statements(raw);
 		EqualsExpression expression = new EqualsExpression("SOFT_COST");
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("1")), equalTo(false));
 	}
 	
@@ -50,7 +46,6 @@ public class EqualsExpressionTest {
 		String raw = "SOFT_COST == 2 ";
 		Statements statements = new Statements(raw);
 		EqualsExpression expression = new EqualsExpression("sdf");
-		assertThat(expression.canHandle(statements), equalTo(false));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("1")), equalTo(false));
 	}
 }

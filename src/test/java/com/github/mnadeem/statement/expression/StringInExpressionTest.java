@@ -14,7 +14,6 @@ public class StringInExpressionTest {
 		String raw = "INFRA_COST IN 4,6,7 ";
 		Statements statements = new Statements(raw);
 		Expression expression = new StringInExpression(null);
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("4")), equalTo(true));
 	}
 	
@@ -23,7 +22,6 @@ public class StringInExpressionTest {
 		String raw = "INFRA_COST IN 4,6,7 ";
 		Statements statements = new Statements(raw);
 		Expression expression = new StringInExpression(null);
-		assertThat(expression.canHandle(statements), equalTo(true));
 		assertThat(expression.evaluate(statements, 0, NameValue.ofDefault("2")), equalTo(false));
 	}
 

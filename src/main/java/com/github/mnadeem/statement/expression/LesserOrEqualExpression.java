@@ -1,13 +1,12 @@
 package com.github.mnadeem.statement.expression;
 
-import com.github.mnadeem.statement.Operator;
 import com.github.mnadeem.statement.Statement;
 import com.github.mnadeem.statement.Statements;
 
 public class LesserOrEqualExpression extends BaseExpression {
 
 	public LesserOrEqualExpression(String name) {
-		super(name, Operator.LESS_OR_EQUAL);
+		super(name);
 	}
 
 	@Override

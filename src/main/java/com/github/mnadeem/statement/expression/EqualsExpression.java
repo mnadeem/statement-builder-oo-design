@@ -1,13 +1,12 @@
 package com.github.mnadeem.statement.expression;
 
-import com.github.mnadeem.statement.Operator;
 import com.github.mnadeem.statement.Statement;
 import com.github.mnadeem.statement.Statements;
 
 public class EqualsExpression extends BaseExpression {
 
 	public EqualsExpression(String name) {
-		super(name, Operator.EQUALS);
+		super(name);
 	}
 
 	@Override

@@ -9,12 +9,7 @@ import com.github.mnadeem.statement.Statements;
 public class GenericExpression extends BaseExpression {
 
 	public GenericExpression(String name) {
-		super(name, null);
-	}
-
-	@Override
-	public boolean canHandle(Statements statements) {
-		return statements.containsNStatements(1) && isFirstNameValid(statements);
+		super(name);
 	}
 
 	@Override

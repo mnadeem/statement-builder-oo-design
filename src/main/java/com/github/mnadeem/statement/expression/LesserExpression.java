@@ -1,13 +1,12 @@
 package com.github.mnadeem.statement.expression;
 
-import com.github.mnadeem.statement.Operator;
 import com.github.mnadeem.statement.Statement;
 import com.github.mnadeem.statement.Statements;
 
 public class LesserExpression extends BaseExpression {
 	
 	public LesserExpression(String name) {
-		super(name, Operator.LESS);
+		super(name);
 	}
 
 	@Override
