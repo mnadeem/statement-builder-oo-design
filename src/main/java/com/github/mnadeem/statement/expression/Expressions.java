@@ -19,7 +19,8 @@ public class Expressions {
 	        put("COUNTRY", new StringInExpression("COUNTRY"));
 	    }
 	});
-
+	
+	//TODO: Do it based on operator and not by LHS
 	public static Expression get(Statement statement) {
 		return EXPRESSIONS.get(statement.getLhs());
 	}
