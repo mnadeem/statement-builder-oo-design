@@ -4,7 +4,7 @@ public enum Conjunction {
 	AND("and"), OR("or");
 	
 	private String code;
-	
+
 	private Conjunction(String code) {
 		this.code = code;
 	}

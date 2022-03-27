@@ -109,5 +109,173 @@ public class StatementsTest {
 		assertThat(statements.getNames().contains("TOTAL_COST"), equalTo(true));
 		
 	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void noEndParan() {
+		String raw = "( SOFTWARE_COST >= 23 AND INFRA_COST <= 900 and TOTAL_COST IN 500,500,700";
+		Statements statements = new Statements(raw);
 
+		assertThat(statements.containsNStatements(3), equalTo(true));
+		assertThat(statements.getNames().contains("SOFTWARE_COST"), equalTo(true));
+		assertThat(statements.getNames().contains("INFRA_COST"), equalTo(true));
+		assertThat(statements.getNames().contains("TOTAL_COST"), equalTo(true));
+		
+	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void noStartParan() {
+		String raw = "SOFTWARE_COST >= 23 AND INFRA_COST <= 900 and TOTAL_COST IN 500,500,700 )";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+		assertThat(statements.getNames().contains("SOFTWARE_COST"), equalTo(true));
+		assertThat(statements.getNames().contains("INFRA_COST"), equalTo(true));
+		assertThat(statements.getNames().contains("TOTAL_COST"), equalTo(true));
+		
+	}
+	
+	@Test
+	public void paranStartAtOneAndEndAt2() {
+		String raw = "( SOFTWARE_COST >= 23 AND INFRA_COST <= 900 ) and TOTAL_COST IN 500,500,700";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+
+		Statement firstStatement = statements.get(0);
+		assertThat(firstStatement.getLhs(), equalTo("SOFTWARE_COST"));
+		assertThat(firstStatement.getOperator(), equalTo(Operator.GREATER_OR_EQUAL));
+		assertThat(firstStatement.getCsv(), equalTo("23"));
+		assertThat(firstStatement.isParanBegins(), equalTo(true));
+		assertThat(firstStatement.isParanEnds(), equalTo(false));
+		
+		Statement secondStatement = statements.get(1);
+		assertThat(secondStatement.getLhs(), equalTo("INFRA_COST"));
+		assertThat(secondStatement.getOperator(), equalTo(Operator.LESS_OR_EQUAL));
+		assertThat(secondStatement.getCsv(), equalTo("900"));
+		assertThat(secondStatement.isParanBegins(), equalTo(false));
+		assertThat(secondStatement.isParanEnds(), equalTo(true));
+		
+		Statement thirdStatement = statements.get(2);
+		assertThat(thirdStatement.getLhs(), equalTo("TOTAL_COST"));
+		assertThat(thirdStatement.getOperator(), equalTo(Operator.IN));
+		assertThat(thirdStatement.getCsv(), equalTo("500,500,700"));
+		assertThat(thirdStatement.isParanBegins(), equalTo(false));
+		assertThat(thirdStatement.isParanEnds(), equalTo(false));
+	}
+	
+	@Test
+	public void paranStartAtOneAndEndAt3() {
+		String raw = "( SOFTWARE_COST   >= 23 AND   INFRA_COST <= 900 and TOTAL_COST IN 500,500,700   )";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+
+		Statement firstStatement = statements.get(0);
+		assertThat(firstStatement.getLhs(), equalTo("SOFTWARE_COST"));
+		assertThat(firstStatement.getOperator(), equalTo(Operator.GREATER_OR_EQUAL));
+		assertThat(firstStatement.getCsv(), equalTo("23"));
+		assertThat(firstStatement.isParanBegins(), equalTo(true));
+		assertThat(firstStatement.isParanEnds(), equalTo(false));
+		
+		Statement secondStatement = statements.get(1);
+		assertThat(secondStatement.getLhs(), equalTo("INFRA_COST"));
+		assertThat(secondStatement.getOperator(), equalTo(Operator.LESS_OR_EQUAL));
+		assertThat(secondStatement.getCsv(), equalTo("900"));
+		assertThat(secondStatement.isParanBegins(), equalTo(false));
+		assertThat(secondStatement.isParanEnds(), equalTo(false));
+		
+		Statement thirdStatement = statements.get(2);
+		assertThat(thirdStatement.getLhs(), equalTo("TOTAL_COST"));
+		assertThat(thirdStatement.getOperator(), equalTo(Operator.IN));
+		assertThat(thirdStatement.getCsv(), equalTo("500,500,700"));
+		assertThat(thirdStatement.isParanBegins(), equalTo(false));
+		assertThat(thirdStatement.isParanEnds(), equalTo(true));
+	}
+	
+	@Test
+	public void paranStartAtTwoAndEndAt3() {
+		String raw = "SOFTWARE_COST   >= 23 AND (  INFRA_COST <= 900 and TOTAL_COST IN 500,500,700   )";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+
+		Statement firstStatement = statements.get(0);
+		assertThat(firstStatement.getLhs(), equalTo("SOFTWARE_COST"));
+		assertThat(firstStatement.getOperator(), equalTo(Operator.GREATER_OR_EQUAL));
+		assertThat(firstStatement.getCsv(), equalTo("23"));
+		assertThat(firstStatement.isParanBegins(), equalTo(false));
+		assertThat(firstStatement.isParanEnds(), equalTo(false));
+		
+		Statement secondStatement = statements.get(1);
+		assertThat(secondStatement.getLhs(), equalTo("INFRA_COST"));
+		assertThat(secondStatement.getOperator(), equalTo(Operator.LESS_OR_EQUAL));
+		assertThat(secondStatement.getCsv(), equalTo("900"));
+		assertThat(secondStatement.isParanBegins(), equalTo(true));
+		assertThat(secondStatement.isParanEnds(), equalTo(false));
+		
+		Statement thirdStatement = statements.get(2);
+		assertThat(thirdStatement.getLhs(), equalTo("TOTAL_COST"));
+		assertThat(thirdStatement.getOperator(), equalTo(Operator.IN));
+		assertThat(thirdStatement.getCsv(), equalTo("500,500,700"));
+		assertThat(thirdStatement.isParanBegins(), equalTo(false));
+		assertThat(thirdStatement.isParanEnds(), equalTo(true));
+	}
+
+	@Test
+	public void paranStartAtThreeAndEndAt3() {
+		String raw = "SOFTWARE_COST   >= 23 AND   INFRA_COST <= 900 and ( TOTAL_COST IN 500,500,700   )";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+
+		Statement firstStatement = statements.get(0);
+		assertThat(firstStatement.getLhs(), equalTo("SOFTWARE_COST"));
+		assertThat(firstStatement.getOperator(), equalTo(Operator.GREATER_OR_EQUAL));
+		assertThat(firstStatement.getCsv(), equalTo("23"));
+		assertThat(firstStatement.isParanBegins(), equalTo(false));
+		assertThat(firstStatement.isParanEnds(), equalTo(false));
+		
+		Statement secondStatement = statements.get(1);
+		assertThat(secondStatement.getLhs(), equalTo("INFRA_COST"));
+		assertThat(secondStatement.getOperator(), equalTo(Operator.LESS_OR_EQUAL));
+		assertThat(secondStatement.getCsv(), equalTo("900"));
+		assertThat(secondStatement.isParanBegins(), equalTo(false));
+		assertThat(secondStatement.isParanEnds(), equalTo(false));
+		
+		Statement thirdStatement = statements.get(2);
+		assertThat(thirdStatement.getLhs(), equalTo("TOTAL_COST"));
+		assertThat(thirdStatement.getOperator(), equalTo(Operator.IN));
+		assertThat(thirdStatement.getCsv(), equalTo("500,500,700"));
+		assertThat(thirdStatement.isParanBegins(), equalTo(true));
+		assertThat(thirdStatement.isParanEnds(), equalTo(true));
+	}
+	
+	@Test
+	public void paranStartAt1AndEndAt1() {
+		String raw = " ( SOFTWARE_COST   >= 23 ) AND   INFRA_COST <= 900 and ( TOTAL_COST IN 500,500,700   )";
+		Statements statements = new Statements(raw);
+
+		assertThat(statements.containsNStatements(3), equalTo(true));
+
+		Statement firstStatement = statements.get(0);
+		assertThat(firstStatement.getLhs(), equalTo("SOFTWARE_COST"));
+		assertThat(firstStatement.getOperator(), equalTo(Operator.GREATER_OR_EQUAL));
+		assertThat(firstStatement.getCsv(), equalTo("23"));
+		assertThat(firstStatement.isParanBegins(), equalTo(true));
+		assertThat(firstStatement.isParanEnds(), equalTo(true));
+		
+		Statement secondStatement = statements.get(1);
+		assertThat(secondStatement.getLhs(), equalTo("INFRA_COST"));
+		assertThat(secondStatement.getOperator(), equalTo(Operator.LESS_OR_EQUAL));
+		assertThat(secondStatement.getCsv(), equalTo("900"));
+		assertThat(secondStatement.isParanBegins(), equalTo(false));
+		assertThat(secondStatement.isParanEnds(), equalTo(false));
+		
+		Statement thirdStatement = statements.get(2);
+		assertThat(thirdStatement.getLhs(), equalTo("TOTAL_COST"));
+		assertThat(thirdStatement.getOperator(), equalTo(Operator.IN));
+		assertThat(thirdStatement.getCsv(), equalTo("500,500,700"));
+		assertThat(thirdStatement.isParanBegins(), equalTo(true));
+		assertThat(thirdStatement.isParanEnds(), equalTo(true));
+	}
 }

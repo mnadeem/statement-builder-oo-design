@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 public class Statements {
 
+	private static final String PARANTHESES_START = "(";
+	private static final String PARANTHESES_END = ")";
+
 	private final List<Statement> statements;
 
 	public Statements(String raw) {
@@ -17,36 +20,86 @@ public class Statements {
 
 	private List<Statement> build(String raw) {
 		List<Statement> result = new ArrayList<Statement>();
-		
-		MutableInteger tokenIndex = MutableInteger.of(0);
-		int tokenIndexStart = tokenIndex.get();
 
-		List<String> tokens = Arrays.asList(raw.split(" "));
+		MutableInteger tokenIndex = MutableInteger.of(0);
+
+		List<String> tokens = Arrays.asList(raw.trim().split("\\s+"));
+		boolean paranBegins = false;
+		boolean paranEnds = false;
 
 		for (Iterator<String> iterator = tokens.iterator(); iterator.hasNext();) {
-			tokenIndexStart = tokenIndex.get();
 			
+			boolean currentParanBegins = false;
+
 			String token =  iterator.next();
 			tokenIndex.increment();
 
-			String lhs = token.trim();
+			if (isCompositeStart(token)) {
+				token =  iterator.next();
+				tokenIndex.increment();
+				paranBegins = true;
+				currentParanBegins = true;
+			}
 
-			Operator operator = Operator.getOperator(iterator.next());
-			tokenIndex.increment();
+			Statement statement = buildStatement(token, tokenIndex, iterator);
+			token = null;
 
-			String csv = extractCSV(operator, iterator, tokenIndex);
-
-			Statement statement = new Statement(lhs, operator, csv, tokenIndexStart);
-			result.add(statement);
+			if (currentParanBegins) {
+				statement.setParanBegins(true);
+			}
 
 			if (iterator.hasNext()) {
-				Conjunction conjunction = Conjunction.getConjunction(iterator.next());
+				token =  iterator.next();
 				tokenIndex.increment();
+			}
+
+			if (isCompositeEnd(token)) {
+				paranEnds = true;
+
+				if (!paranBegins) {
+					throw new IllegalStateException("Parantheses Does not start");
+				}
+
+				statement.setParanEnds(true);
+				if (iterator.hasNext()) {
+					token =  iterator.next();
+					tokenIndex.increment();
+				}
+			} else {
+				Conjunction conjunction = Conjunction.getConjunction(token);
 				statement.setConjunction(conjunction);
 			}
+
+			result.add(statement);
+		}
+
+		if (paranBegins && !paranEnds) {
+			throw new IllegalStateException("Parantheses Not properly closed!");
 		}
 
 		return result;
+	}
+
+	private boolean isCompositeEnd(String token) {
+		return token != null && PARANTHESES_END.equals(token.trim());
+	}
+
+	private boolean isCompositeStart(String token) {
+		return token != null && PARANTHESES_START.equals(token.trim());
+	}
+
+	private Statement buildStatement(String token, MutableInteger tokenIndex, Iterator<String> iterator) {
+		int tokenIndexStart = tokenIndex.get();
+
+		String lhs = token.trim();
+
+		Operator operator = Operator.getOperator(iterator.next());
+		tokenIndex.increment();
+
+		String csv = extractCSV(operator, iterator, tokenIndex);
+
+		Statement statement = new Statement(lhs, operator, csv, tokenIndexStart);
+		return statement;
 	}
 
 	private String extractCSV(Operator operator, Iterator<String> iterator, MutableInteger tokenIndex) {

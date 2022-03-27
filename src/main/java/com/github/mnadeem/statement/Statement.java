@@ -7,6 +7,8 @@ public class Statement {
 	private String csv;
 	private int index;
 	private Conjunction conjunction;
+	private boolean paranBegins;
+	private boolean paranEnds;
 
 	public Statement(String lhs, Operator operator, String csv, int index) {
 		super();
@@ -40,10 +42,25 @@ public class Statement {
 		this.conjunction = conjunction;
 	}
 
+	public boolean isParanBegins() {
+		return paranBegins;
+	}
+
+	public void setParanBegins(boolean paranBegins) {
+		this.paranBegins = paranBegins;
+	}
+
+	public boolean isParanEnds() {
+		return paranEnds;
+	}
+
+	public void setParanEnds(boolean paranEnds) {
+		this.paranEnds = paranEnds;
+	}
+
 	@Override
 	public String toString() {
 		return "Statement [lhs=" + lhs + ", operator=" + operator + ", csv=" + csv + ", index=" + index
-				+ ", conjunction=" + conjunction + "]";
+				+ ", conjunction=" + conjunction + ", paranBegins=" + paranBegins + ", paranEnds=" + paranEnds + "]";
 	}
-	
 }
