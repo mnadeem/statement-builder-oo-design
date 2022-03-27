@@ -2,6 +2,7 @@ package com.github.mnadeem.statement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,8 +14,16 @@ public class Statements {
 	private static final String PARANTHESES_END = ")";
 
 	private final List<Statement> statements;
+	private final boolean validationRequired;
+	private final List<String> validVariables;
 
 	public Statements(String raw) {
+		this(Collections.emptyList(), raw);
+	}
+
+	public Statements(List<String> validVariables, String raw) {
+		this.validationRequired = (validVariables != null && !validVariables.isEmpty());
+		this.validVariables = validVariables;
 		this.statements = build(raw);
 	}
 
@@ -92,6 +101,10 @@ public class Statements {
 		int tokenIndexStart = tokenIndex.get();
 
 		String lhs = token.trim();
+
+		if (validationRequired && !validVariables.contains(lhs)) {
+			throw new IllegalArgumentException("Invalid Variable : " + lhs);
+		}
 
 		Operator operator = Operator.getOperator(iterator.next());
 		tokenIndex.increment();
