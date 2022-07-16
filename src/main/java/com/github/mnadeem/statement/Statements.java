@@ -33,7 +33,7 @@ public class Statements {
 
 		MutableInteger tokenIndex = MutableInteger.of(0);
 
-		List<String> tokens = Arrays.asList(raw.trim().split("\\s+"));
+		List<String> tokens = Arrays.asList(raw.trim().split("\\s"));
 		boolean paranBegins = false;
 		boolean paranEnds = false;
 
@@ -41,12 +41,10 @@ public class Statements {
 			
 			boolean currentParanBegins = false;
 
-			String token =  iterator.next();
-			tokenIndex.increment();
+			String token =  doGetToken(tokenIndex, iterator);
 
 			if (isCompositeStart(token)) {
-				token =  iterator.next();
-				tokenIndex.increment();
+				token =  doGetToken(tokenIndex, iterator);
 				paranBegins = true;
 				currentParanBegins = true;
 			}
@@ -68,8 +66,7 @@ public class Statements {
 
 				statement.setParanEnds(true);
 				if (iterator.hasNext()) {
-					token =  iterator.next();
-					tokenIndex.increment();
+					token =  doGetToken(tokenIndex, iterator);
 				}
 				if (Conjunction.isConjunction(token)) {
 					statement.setConjunction(Conjunction.getConjunction(token));
@@ -88,6 +85,17 @@ public class Statements {
 
 		return result;
 	}
+	
+	private String doGetToken( MutableInteger tokenIndex, Iterator<String> iterator) {
+		while (iterator.hasNext()) {
+			String token =  iterator.next();
+			tokenIndex.increment();
+			if (token != null && token.trim().length() > 0) {
+				return token;
+			}			
+		}
+		return null;
+	}
 
 	private boolean isCompositeEnd(String token) {
 		return token != null && PARANTHESES_END.equals(token.trim());
@@ -105,8 +113,10 @@ public class Statements {
 		if (validationRequired && !validVariables.contains(lhs)) {
 			throw new IllegalArgumentException("Invalid Variable : " + lhs);
 		}
+		
+		String opr =  doGetToken(tokenIndex, iterator);
 
-		Operator operator = Operator.getOperator(iterator.next());
+		Operator operator = Operator.getOperator(opr);
 		tokenIndex.increment();
 
 		CsvToken csvToken = extractCSV(operator, iterator, tokenIndex);
@@ -127,15 +137,17 @@ public class Statements {
 			token =  iterator.next();
 			tokenIndex.increment();
 
-			if (token != null && (!PARANTHESES_END.equals(token.trim()) && !Conjunction.isConjunction(token) && !Operator.isOperator(token) && !validVariables.contains(token.trim()))) {
+			if (token != null && (!PARANTHESES_END.equals(token.trim()) && !Conjunction.isConjunction(token) && !Operator.isOperator(token) && !SEPERATOR_SPACE.equals(token) && !validVariables.contains(token.trim()))) {
 				result.append(SEPERATOR_SPACE).append(token);
+			} else if (SEPERATOR_SPACE.equals(token)) {
+				result.append(SEPERATOR_SPACE);
 			} else {
 				nextToken = token != null ? token.trim() : null;
 				break;
 			}
 		}
 
-		return new CsvToken(result.toString(), nextToken);
+		return new CsvToken(result.toString().trim(), nextToken);
 	}
 
 	public void forEach(Consumer<Statement> consumer) {
