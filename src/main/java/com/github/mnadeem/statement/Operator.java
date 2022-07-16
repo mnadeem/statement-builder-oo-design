@@ -16,6 +16,18 @@ public enum Operator {
         }
         throw new IllegalArgumentException("Unknow Operator " + value);
     }
+	
+	public static boolean isOperator(String value) {
+		String trimmed = value.trim();
+		for (Operator operator : values()) {
+			if (operator.code.equalsIgnoreCase(trimmed)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 
 	public boolean isIN() {
 		return IN == this;

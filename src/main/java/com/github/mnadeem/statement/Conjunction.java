@@ -8,6 +8,19 @@ public enum Conjunction {
 	private Conjunction(String code) {
 		this.code = code;
 	}
+	
+	public static boolean isConjunction(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return false;
+		}
+		String trimmed = value.trim();
+		for (Conjunction conj : values()) {
+			if (conj.code.equalsIgnoreCase(trimmed)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static Conjunction getConjunction(String value) {
 		if (value == null || value.trim().isEmpty()) {

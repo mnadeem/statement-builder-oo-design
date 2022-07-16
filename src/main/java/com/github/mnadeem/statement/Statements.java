@@ -12,6 +12,7 @@ public class Statements {
 
 	private static final String PARANTHESES_START = "(";
 	private static final String PARANTHESES_END = ")";
+	private static final String SEPERATOR_SPACE = " ";
 
 	private final List<Statement> statements;
 	private final boolean validationRequired;
@@ -50,16 +51,12 @@ public class Statements {
 				currentParanBegins = true;
 			}
 
-			Statement statement = buildStatement(token, tokenIndex, iterator);
-			token = null;
+			StatementToken statementToken = buildStatement(token, tokenIndex, iterator);
+			Statement statement = statementToken.getStatement();
+			token = statementToken.getNextToken();
 
 			if (currentParanBegins) {
 				statement.setParanBegins(true);
-			}
-
-			if (iterator.hasNext()) {
-				token =  iterator.next();
-				tokenIndex.increment();
 			}
 
 			if (isCompositeEnd(token)) {
@@ -73,6 +70,9 @@ public class Statements {
 				if (iterator.hasNext()) {
 					token =  iterator.next();
 					tokenIndex.increment();
+				}
+				if (Conjunction.isConjunction(token)) {
+					statement.setConjunction(Conjunction.getConjunction(token));
 				}
 			} else {
 				Conjunction conjunction = Conjunction.getConjunction(token);
@@ -97,7 +97,7 @@ public class Statements {
 		return token != null && PARANTHESES_START.equals(token.trim());
 	}
 
-	private Statement buildStatement(String token, MutableInteger tokenIndex, Iterator<String> iterator) {
+	private StatementToken buildStatement(String token, MutableInteger tokenIndex, Iterator<String> iterator) {
 		int tokenIndexStart = tokenIndex.get();
 
 		String lhs = token.trim();
@@ -109,16 +109,33 @@ public class Statements {
 		Operator operator = Operator.getOperator(iterator.next());
 		tokenIndex.increment();
 
-		String csv = extractCSV(operator, iterator, tokenIndex);
+		CsvToken csvToken = extractCSV(operator, iterator, tokenIndex);
 
-		Statement statement = new Statement(lhs, operator, csv, tokenIndexStart);
-		return statement;
+		Statement statement = new Statement(lhs, operator, csvToken.getCsv(), tokenIndexStart);
+		return new StatementToken(statement, csvToken.getNextToken());
 	}
 
-	private String extractCSV(Operator operator, Iterator<String> iterator, MutableInteger tokenIndex) {
-		String token =  iterator.next().trim();
+	private CsvToken extractCSV(Operator operator, Iterator<String> iterator, MutableInteger tokenIndex) {
+		StringBuilder result = new StringBuilder();
+		String nextToken = null;
+
+		String token =  iterator.next();
+		result.append(token);
 		tokenIndex.increment();
-		return token;
+		
+		while(iterator.hasNext()) {
+			token =  iterator.next();
+			tokenIndex.increment();
+
+			if (token != null && (!PARANTHESES_END.equals(token.trim()) && !Conjunction.isConjunction(token) && !Operator.isOperator(token) && !validVariables.contains(token.trim()))) {
+				result.append(SEPERATOR_SPACE).append(token);
+			} else {
+				nextToken = token != null ? token.trim() : null;
+				break;
+			}
+		}
+
+		return new CsvToken(result.toString(), nextToken);
 	}
 
 	public void forEach(Consumer<Statement> consumer) {
@@ -143,5 +160,41 @@ public class Statements {
 	
 	public Statement get(int index) {
 		return this.statements.get(index);
+	}
+
+	private static class CsvToken {
+		private String csv;
+		private String nextToken;
+		
+		public CsvToken(String csv, String nextToken) {
+			this.csv = csv;
+			this.nextToken = nextToken;
+		}
+
+		public String getCsv() {
+			return csv;
+		}
+
+		public String getNextToken() {
+			return nextToken;
+		}
+	}
+	
+	private static class StatementToken {
+		private Statement statement;
+		private String nextToken;
+		
+		public StatementToken(Statement statement, String nextToken) {
+			this.statement = statement;
+			this.nextToken = nextToken;
+		}
+
+		public Statement getStatement() {
+			return statement;
+		}
+
+		public String getNextToken() {
+			return nextToken;
+		}
 	}
 }
